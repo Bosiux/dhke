@@ -1,0 +1,2 @@
+gcc -I../include -I../protocol ../src/dhke*.c main.c -o main_test -lcrypto -lssl
+gcc -I../include -I../protocol ../src/dhke*.c main.c -o main_test -lcrypto -lssl 
