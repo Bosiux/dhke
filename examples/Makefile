@@ -16,7 +16,7 @@ SRC_FILES = $(wildcard $(SRC_DIR)/dhke*.c)
 # Targets
 .PHONY: all local protocol clean help
 
-all: local protocol
+all: local protocol server client
 
 local: main.c $(SRC_FILES)
 	$(CC) $(CFLAGS) $(SRC_FILES) main.c -o local $(LIBS)
@@ -24,16 +24,13 @@ local: main.c $(SRC_FILES)
 protocol: protocol_test.c $(SRC_FILES) $(PROTOCOL_DIR)/protocol.c
 	$(CC) $(CFLAGS) $(SRC_FILES) $(PROTOCOL_DIR)/protocol.c protocol_test.c -o protocol $(LIBS)
 
-clean:
-	rm -f local protocol
+server: server.c $(SRC_FILES) $(PROTOCOL_DIR)/protocol.c
+	$(CC) $(CFLAGS) $(SRC_FILES) $(PROTOCOL_DIR)/protocol.c server.c -o server $(LIBS)
 
-help:
-	@echo "Usage: make [target]"
-	@echo ""
-	@echo "Targets:"
-	@echo "  all             Build both main_test and protocol_test"
-	@echo "  local       Compile the local test (main.c)"
-	@echo "  protocol   Compile the protocol test (protocol_test.c)"
-	@echo "  clean           Remove compiled binaries"
-	@echo "  help            Show this help message"
+client: client.c $(SRC_FILES) $(PROTOCOL_DIR)/protocol.c
+	$(CC) $(CFLAGS) $(SRC_FILES) $(PROTOCOL_DIR)/protocol.c client.c -o client $(LIBS)
+clean:
+	rm -f local protocol server client
+
+
 

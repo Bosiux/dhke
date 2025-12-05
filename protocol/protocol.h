@@ -19,7 +19,7 @@ int protocol_init_connection(int *sockfd, ProtocolRole role, const char *address
 int protocol_perform_dhke(int sockfd, DHKE_Context *ctx);
 
 // Secure message I/O
-int protocol_send_secure(int sockfd, DHKE_Context *ctx, const uint8_t *msg, size_t len);
+int protocol_send_secure(int sockfd, DHKE_Context *ctx, const uint8_t *msg, size_t len, uint8_t *ciphertext);
 int protocol_receive_secure(int sockfd, DHKE_Context *ctx, uint8_t *buffer, size_t max_len);
 
 // Network helpers

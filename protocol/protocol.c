@@ -64,7 +64,7 @@ int protocol_perform_dhke(int sockfd, DHKE_Context *ctx);
  * @param len Length of the plaintext message.
  * @return 0 on success, -1 on failure.
  */
-int protocol_send_secure(int sockfd, DHKE_Context *ctx, const uint8_t *msg, size_t len);
+int protocol_send_secure(int sockfd, DHKE_Context *ctx, const uint8_t *msg, size_t len, uint8_t *ciphertext);
 
 /**
  * @brief Receives and decrypts a securely encrypted message from a socket.
@@ -163,19 +163,18 @@ int protocol_perform_dhke(int sockfd, DHKE_Context *ctx) {
     return 0;
 }
 
-int protocol_send_secure(int sockfd, DHKE_Context *ctx, const uint8_t *msg, size_t len) {
+int protocol_send_secure(int sockfd, DHKE_Context *ctx, const uint8_t *msg, size_t len, uint8_t *ciphertext) {
     uint8_t nonce[DHKE_NONCE_SIZE];
     uint8_t tag[16];
-    uint8_t ciphertext[len];
+    int cipher_alloc = 0;
+    
+    if (ciphertext == NULL) {
+        ciphertext = (uint8_t *)malloc(len);
+        cipher_alloc = 1;
+    }
     
     dhke_encrypt(ctx, msg, len, ciphertext, nonce, tag);
     
-    printf("Encrypted ciphertext (%zu bytes): ", len);
-    for (size_t i = 0; i < len; ++i) {
-        printf("%02x ", ciphertext[i]);
-    }
-    printf("\n");
-
     if (protocol_send(sockfd, nonce, DHKE_NONCE_SIZE) != DHKE_NONCE_SIZE) {
         fprintf(stderr, "Failed to send nonce\n");
         return -1;
@@ -189,6 +188,10 @@ int protocol_send_secure(int sockfd, DHKE_Context *ctx, const uint8_t *msg, size
     if (protocol_send(sockfd, ciphertext, len) != len) {
         fprintf(stderr, "Failed to send ciphertext\n");
         return -1;
+    }
+
+    if (cipher_alloc) {
+        free(ciphertext);
     }
     
     return 0;

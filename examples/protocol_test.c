@@ -83,7 +83,7 @@ void run_client(const char *server_ip) {
             break; 
         }
 
-        protocol_send_secure(sockfd, &ctx, (uint8_t*)msg, strlen(msg) + 1);
+        protocol_send_secure(sockfd, &ctx, (uint8_t*)msg, strlen(msg) + 1, NULL);
     }
 
     close(sockfd);
